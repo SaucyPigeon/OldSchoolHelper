@@ -4,12 +4,17 @@
 # - User can define gear for a given slayer monster
 # - User can select a defined slayer monster to display gear required
 # - User can save this data (slayer monsters, gear) and load for later use.
-  
+
+import osh_io
+
 import json
   
+  
+# Utility functions
+
 def quote(value):
 	return "\"" + value + "\""
-	  
+
 def input_bool(message):
 	print(message)
 	value = input()
@@ -20,13 +25,21 @@ def input_bool(message):
 	else:
 		print(quote(value) + " is not a valid input.")
 		return input_bool(message)
+
+def concat(*values):
+	result = ""
+	for value in values:
+		result = result + str(value)
+	return result
 		
+# Business logic
 
 possible_slots = [
 	"helmet", "necklace", "ammo", "cape", "torso", "legs",
 	"gloves", "boots", "ring", "weapon", "offhand"
 ]
 
+file_path = "data.json"
 
 # Represents a data record for a monster and corresponding gear.
 class slayer_record:
@@ -34,7 +47,7 @@ class slayer_record:
 		self.monster = monster
 		self.gear = gear
 
-class slayer_gear:
+class slayer_gear(dict):
 	# Possible slots:
 	# - helmet
 	# - neck
@@ -50,29 +63,37 @@ class slayer_gear:
 	
 	# Param: data is a dictionary. Keys represents the slot, values represent
 	# the equipment.
-	def __init__(self, data):
+	def __init__(self, fname):
 		counter = 0
 		
 		slot_len = len(possible_slots)
-		data_len = len(data.items())
-		data_two_handed = data["weapon"].two_handed
+		data_len = len(fname.items())
+
+		if not "weapon" in fname:
+			raise ValueError("Data param must have weapon slot.")
+		
+		data_two_handed = fname["weapon"].two_handed
 		if data_two_handed:
 			slot_len = slot_len - 1
 	
 		
 		if slot_len != data_len:
-			raise ValueError("Data param must be same length as possible slots (current=" + data_len + ", expected=" + slot_len + ")")
+			raise ValueError(concat("Data param must be same length as possible slots (current=", data_len, ", expected=", slot_len, ")"))
+	    
 		for possible_slot in possible_slots:
 			if data_two_handed and possible_slot == "offhand":
 				continue
-			if not possible_slot in data:
+			if not possible_slot in fname:
 				raise ValueError("Data param must contain key: " + possible_slot)
-		self.data = data
+		dict.__init__(self, fname=fname)
 		
 class weapon_record:
 	def __init__(self, name, two_handed):
 		self.name = name
 		self.two_handed = two_handed
+
+	def __str__(self):
+		return self.name
 
 records = []
 
@@ -122,7 +143,7 @@ def add_gear():
 		print("Enter item for " + possible_slot + " slot: ")
 		item_name = input()
 		if possible_slot == "weapon":
-			two_handed = input_bool("Is the weapon one-handed? ")
+			two_handed = not input_bool("Is the weapon one-handed? ")
 			weapon = weapon_record(item_name, two_handed)
 			gear[possible_slot] = weapon
 		elif possible_slot == "offhand" and two_handed:
@@ -130,7 +151,7 @@ def add_gear():
 		else:
 			gear[possible_slot] = item_name
 
-		record.gear = slayer_gear(gear)
+	record.gear = slayer_gear(gear)
 
 def show_monster_gear():
 	if len(records) == 0:
@@ -149,39 +170,80 @@ def show_monster_gear():
 		print("No gear has been defined for record.")
 		return
 		
-	for slot, item in record.gear.items():
-		print(slot + " slot: " + item)
+	for slot, item in record.gear.data.items():
+		print(concat(slot, " slot: ", item))
 	
 	
 def exit_program():
 	print("Saving data.")
 	
-	with open("data.json", "w", encoding="utf-8") as f:
+	with open(file_path, "w", encoding="utf-8") as f:
 		json.dump(records, f, ensure_ascii=False, indent=4)
+
+possible_slots = [
+	"helmet", "necklace", "ammo", "cape", "torso", "legs",
+	"gloves", "boots", "ring", "weapon", "offhand"
+]
+
+
+def debug_steel_dragon():
+
+    print("Adding steel dragon record.")
+
+    gear_dict = {
+	"helmet": "foo",
+	"necklace": "foo",
+	"ammo": "foo",
+	"cape": "foo",
+	"torso": "foo",
+	"legs": "foo",
+	"gloves": "foo",
+	"boots": "foo",
+	"ring": "foo",
+	"weapon": weapon_record("foo", False),
+	"offhand": "foo"
+    }
+    gear = slayer_gear(gear_dict)
+    record = slayer_record("steel dragon", gear)
+    records.append(record)
+    
+    print("Record added.")
+    
+    
 
 print("Welcome to Old School Helper")
 print("****************************")
+
+if osh_io.path_exists(file_path):
+        print(concat("Loading data from file ", file_path))
+        with open(file_path) as f:
+                records = json.load(f)
+        print("Data successfully loaded.")
+
 while True:
-		print("Available commands:")
+	print("Available commands:")
 
-		options = {
-				"add slayer monster": add_slayer_monster,
-				"add gear": add_gear,
-				"show monster gear": show_monster_gear,
-				"exit": exit_program
-		}
+	options = {
+		"add slayer monster": add_slayer_monster,
+		"add gear": add_gear,
+		"show monster gear": show_monster_gear,
+		"exit": exit_program,
+		"DEBUG steel dragon": debug_steel_dragon
+	}
 
-		for key, value in options.items():
-				print("\t* " + key)
+	for key, value in options.items():
+		if key.startswith("DEBUG"):
+			continue
+		print("\t* " + key)
 
-		print("\n")
-		print("Enter command: ")
-		option = input()
+	print("\n")
+	print("Enter command: ")
+	option = input()
 
-		if not option in options:
-				print("That command does not exist.")
-				print("Please try again.")
-				continue
+	if not option in options:
+		print("That command does not exist.")
+		print("Please try again.")
+		continue
 
-		options[option]()
-				
+	func = options[option]
+	func()
