@@ -47,7 +47,7 @@ class slayer_record:
 		self.monster = monster
 		self.gear = gear
 
-class slayer_gear(dict):
+class slayer_gear:
 	# Possible slots:
 	# - helmet
 	# - neck
@@ -63,16 +63,16 @@ class slayer_gear(dict):
 	
 	# Param: data is a dictionary. Keys represents the slot, values represent
 	# the equipment.
-	def __init__(self, fname):
+	def __init__(self, data):
 		counter = 0
 		
 		slot_len = len(possible_slots)
-		data_len = len(fname.items())
+		data_len = len(data.items())
 
-		if not "weapon" in fname:
+		if not "weapon" in data:
 			raise ValueError("Data param must have weapon slot.")
 		
-		data_two_handed = fname["weapon"].two_handed
+		data_two_handed = data["weapon"].two_handed
 		if data_two_handed:
 			slot_len = slot_len - 1
 	
@@ -83,9 +83,9 @@ class slayer_gear(dict):
 		for possible_slot in possible_slots:
 			if data_two_handed and possible_slot == "offhand":
 				continue
-			if not possible_slot in fname:
+			if not possible_slot in data:
 				raise ValueError("Data param must contain key: " + possible_slot)
-		dict.__init__(self, fname=fname)
+		self.data=data
 		
 class weapon_record:
 	def __init__(self, name, two_handed):
@@ -178,7 +178,7 @@ def exit_program():
 	print("Saving data.")
 	
 	with open(file_path, "w", encoding="utf-8") as f:
-		json.dump(records, f, ensure_ascii=False, indent=4)
+		json.dump(records.data, f, ensure_ascii=False, indent=4)
 
 possible_slots = [
 	"helmet", "necklace", "ammo", "cape", "torso", "legs",
