@@ -1,32 +1,28 @@
 # Old School Helper
-# gear.py
-# Encapsulates gear record
+# task.py
+# Plain old data type for task records.
 
-from utils import input_bool
-
-class gear(object):
-    def __init__(self):
-        self.slot_dict = {}
+from gear import gear
+import json
 
 
-    def __len__(self):
-        return len(self.slot_dict.items())
+class task(object):
+    def __init__(self, monster: str):
+        self.monster = monster
+        self.gear = {}
 
 
-    def clear(self):
-        self.slot_dict.clear()
+    def __str__(self):
+        return self.monster
 
 
-    def items(self):
-        return self.slot_dict.items()
-
-    def input_gear(self, monster):
-        if len(self):
-            print("Gear already exists for this task (" + monster + ").")
+    def input_gear(self):
+        if len(self.gear):
+            print("Gear already exists for this task (" + self.monster + ").")
             if not input_bool("Are you sure that you want to overwrite existing gear?"):
                 return
             else:
-                self.slot_dict.clear()
+                self.gear.clear()
         
         slots = [
             "helmet",
@@ -50,7 +46,9 @@ class gear(object):
                 continue
             print("Enter item for " + slot + " slot:")
             i = input()
-            self.slot_dict[slot] = i
+            self.gear[slot] = i
             print("Added " + i + " to " + slot + " slot.")
             
-        print("Gear successfully added for " + monster + ".")
+        print("Gear successfully added for " + self.monster + ".")
+
+

@@ -6,17 +6,12 @@ from utils import input_bool
 from utils import confirm_prompt
 from utils import prompt
 from gear import gear
+from task import task
 
 import json
 
-class task(dict):
-    def __init__(self, monster):
-        dict.__init__(self, monster=monster, gear=gear())
 
-    def __str__(self):
-        return self.monster
-
-class task_manager:
+class task_manager(object):
     def __init__(self):
         self.selected_task = None
         self.tasks = []
@@ -97,7 +92,7 @@ class task_manager:
             print("No current task selected.")
             return
 
-        self.selected_task.gear.input_gear(self.selected_task.monster)
+        self.selected_task.input_gear()
             
     
     def remove_gear_from_task(self):
@@ -145,11 +140,32 @@ class task_manager:
     def save(self):
         path = "data.json"
         with open(path, "w") as outfile:
-            s = json.dumps(self.__dict__)
-            outfile.write(s)
+            target = [
+                task("a1"),
+                task("b2"),
+                task("c3")
+                ]
+            s = json.dumps(target, lambda o: o.__dict__, indent=4)
+            print(s)
+            #outfile.write(s)
+
+            
+            #s = json.dumps(self.__dict__, lambda o: o.__dict__, indent=4)
+            #outfile.write(s)
+            #target = self.tasks[0]
+            #print(target.__dict__)
+            #s = json.dumps(target.__dict__, lambda o: o.__dict__, indent=4)
+            #outfile.write(s)
         print("Successfully saved to " + path)
 
 
     def load(self):
         return None
+
+    def DEBUG_steel_dragon(self):
+        t = task("steel dragon")
+        self.tasks.append(t)
+        self.selected_task = t
+        print(str(self.__dict__))
+        self.save()
         

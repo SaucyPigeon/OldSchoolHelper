@@ -40,11 +40,13 @@ def entry():
         command("rename", "rename selected task monster", tasks.rename_task_monster),
         command("save", "save data to disk", tasks.save),
         command("load", "load data from disk", tasks.load),
+        command("DEBUG a", "", tasks.DEBUG_steel_dragon),
         command("help", "display available commands", None)
         ]
 
     for c in commands:
-        print(str(c))
+        if not c.name.startswith("DEBUG"):
+            print(str(c))
 
     while True:
         print("Enter command:")
@@ -55,7 +57,8 @@ def entry():
             continue
         if selected_command.name == "help":
             for c in commands:
-                print(str(c))
+                if not c.name.startswith("DEBUG"):
+                    print(str(c))
             continue
         
         selected_command.func()
