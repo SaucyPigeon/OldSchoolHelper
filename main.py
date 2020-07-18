@@ -4,6 +4,7 @@
 # Slayer tasks have preferred gear setups saved as well.
 
 import task_manager
+from utils import quote
 
 class command:
     def __init__(self, name, desc, func):
@@ -13,9 +14,6 @@ class command:
 
     def __str__(self):
         return self.name + ": " + self.desc
-
-def quote(message, quote_s):
-    return quote_s + message + quote_s
 
 def get_command_with_name(commands, name):
     for command in commands:

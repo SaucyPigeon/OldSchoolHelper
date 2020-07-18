@@ -2,15 +2,7 @@
 # task_manager.py
 # Encapsulates program state
 
-def input_bool(message):
-    print(message)
-    i = input()
-    if i == "y":
-        return True
-    if i == "n":
-        return False
-    print("Invalid input: has to be either \"y\" or \"n\". Please try again.")
-    return input_bool(message)
+from utils import input_bool
 
 class task:
     def __init__(self, monster):
