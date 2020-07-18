@@ -15,6 +15,15 @@ def input_bool(message):
     return input_bool(message)
 
 
+# Prompt the user with "Are you sure that you want to ___?".
+def confirm_prompt(action):
+    return input_bool("Are you sure that you want to " + action + "?")
+
+# Print a message and return a string user input.
+def prompt(message):
+    print(message)
+    i = input()
+    return i
 
 # Return the message with the quote string added to both sides.
 def quote(message, quote_s):

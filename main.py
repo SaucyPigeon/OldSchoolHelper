@@ -30,13 +30,16 @@ def entry():
     tasks = task_manager.task_manager()
     
     commands = [
-        command("add task", "add new task", tasks.add_new_task),
+        command("taska", "add new task", tasks.add_new_task),
         command("select", "select task", tasks.select_task),
         command("deselect", "deselect task", tasks.deselect_task),
         command("delete", "delete selected task", tasks.delete_task),
-        command("add gear", "add gear to task", tasks.add_gear_to_task),
-        command("remove gear", "remove gear from task", tasks.remove_gear_from_task),
-        command("display gear", "display task gear", tasks.display_task_gear),
+        command("geara", "add gear to task", tasks.add_gear_to_task),
+        command("geardel", "remove gear from task", tasks.remove_gear_from_task),
+        command("geardis", "display task gear", tasks.display_task_gear),
+        command("rename", "rename selected task monster", tasks.rename_task_monster),
+        command("save", "save data to disk", tasks.save),
+        command("load", "load data from disk", tasks.load),
         command("help", "display available commands", None)
         ]
 
